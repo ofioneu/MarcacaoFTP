@@ -5,6 +5,7 @@ import datetime
 from datetime import datetime, date
 import time
 import shutil
+import sys
 
 
 def main():
@@ -21,37 +22,35 @@ def main():
     
     
     for _, _, arquivo in os.walk(origem):
-        print(arquivo)
-
+        pass
+    
     try:
         ftp = ftplib.FTP(host)
-        ftp.login(user, passw)
-        print('Conectado com sucesso!')
-    
+        ftp.login(user, passw)    
     except:
-        print("Falha de conexao FTP!")
+        sys.exit()
     
     finally:
-        ftp.cwd(destino)      
-        
-        
+        ftp.cwd(destino)
+
         for i in range(len(arquivo)):
             data_e_hora_atuais = datetime.now()
-            data_e_hora_em_texto = data_e_hora_atuais.strftime('%Y-%m-%d %H-%M-%S')
-            #shutil.copy(origem+arquivo[i], backup)
-            
-            
+            data_e_hora_em_texto = data_e_hora_atuais.strftime('%Y-%m-%d %H-%M-%S') 
             
             with open(origem+arquivo[i],'rb') as file:
-                print('Arquivo de origem aberto!')
+        
                 try:        
                     ftp.storbinary('STOR '+arquivo[i] , file)
-                    print("Arquivo enviado com sucesso!!")
+                    
+                                  
                 except:
-                    print("Erro ao enviar o arquivo!")
+                    ftp.quit()
+                    sys.exit()
+                
+                    
             os.rename(origem + arquivo[i], backup + data_e_hora_em_texto + ' ' + arquivo[i])
-
         ftp.quit()
+        sys.exit()                   
 
 if __name__ == '__main__':
     main()
